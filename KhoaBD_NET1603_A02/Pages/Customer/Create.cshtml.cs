@@ -5,16 +5,20 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using PRN221.Domain.Models;
 
 using Application.Repository;
+using Domain.Dto;
+using MapsterMapper;
 
 namespace RazorPage.Pages.Customers
 {
     public class CreateModel : PageModel
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public CreateModel(IUnitOfWork unitOfWork)
+        public CreateModel(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         public IActionResult OnGet()
@@ -23,18 +27,20 @@ namespace RazorPage.Pages.Customers
         }
 
         [BindProperty]
-        public Customer Customer { get; set; } = default!;
+        public CustomerDto Customer { get; set; } = default!;
 
 
         // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!ModelState.IsValid || Customer == null)
+            if (!ModelState.IsValid)
             {
                 return Page();
             }
 
-          
+            var customer = _mapper.Map<Customer>(Customer);
+
+            var result = _unitOfWork.Customer.CreateAsync(customer, true);
 
             return RedirectToPage("./Index");
         }

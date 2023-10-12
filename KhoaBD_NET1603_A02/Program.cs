@@ -1,5 +1,8 @@
 using Application.Configuration;
+using Domain.Models;
+using FluentValidation.AspNetCore;
 using RazorPage.Configuration;
+using System.Reflection;
 
 namespace KhoaBD_NET1603_A02
 {
@@ -17,6 +20,10 @@ namespace KhoaBD_NET1603_A02
             builder.Services.RegisterMapster();
 
             builder.Services.AddRazorPages();
+
+            builder.Services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
+
+            builder.Services.AddFluentValidation(options => options.RegisterValidatorsFromAssembly(Assembly.GetAssembly(typeof(Admin))));
 
             var app = builder.Build();
 
