@@ -1,0 +1,42 @@
+﻿@page
+@model KhoaBDRazorPage.Pages.Auth.SignupModel
+@{
+}
+<form method="post">
+    <div class="form-group">
+        <label for="CustomerName">Customer Name</label>
+        <input type="text" id="CustomerName" name="CustomerName" asp-for="Account.CustomerName" class="form-control" />
+        <span asp-validation-for="Account.CustomerName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="Telephone">Telephone</label>
+        <input type="text" id="Telephone" name="Telephone" asp-for="Account.Telephone" class="form-control" />
+        <span asp-validation-for="Account.Telephone" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="Email">Email</label>
+        <input type="text" id="Email" name="Email" asp-for="Account.Email" class="form-control" />
+        <span asp-validation-for="Account.Email" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="CustomerBirthday">Customer Birthday</label>
+        <input type="date" id="CustomerBirthday" name="CustomerBirthday" asp-for="Account.CustomerBirthday" class="form-control" />
+        <span asp-validation-for="Account.CustomerBirthday" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="Password">Password</label>
+        <input type="password" id="Password" name="Password" asp-for="Account.Password" class="form-control" />
+        <span asp-validation-for="Account.Password" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="PasswordConfirm">PasswordConfirm</label>
+        <input type="password" id="Password" name="Password" asp-for="Account.PasswordConfirm" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Sign Up</button>
+</form>

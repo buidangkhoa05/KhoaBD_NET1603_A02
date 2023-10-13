@@ -24,6 +24,7 @@ namespace Application.Repository
         public IGenericRepository<Supplier> Supplier { get; }
         public IGenericRepository<CarInformation> CarInformation { get; }
         public IGenericRepository<RentingTransaction> RentingTrans { get; }
+        public IGenericRepository<RentingDetail> RentingDetail { get; }
         #endregion Repository
     }
 }

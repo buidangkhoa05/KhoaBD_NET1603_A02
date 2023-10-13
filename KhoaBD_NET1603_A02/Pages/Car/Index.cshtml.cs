@@ -8,9 +8,12 @@ using Microsoft.EntityFrameworkCore;
 using Domain.Models;
 using PRN221.Domain.Models;
 using Team5.Domain.Common;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace KhoaBDRazorPage.Pages.Car
 {
+    [Authorize(Roles = "admin")]
     public class IndexModel : PageModel
     {
         private readonly IUnitOfWork _unitOfWork;

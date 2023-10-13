@@ -26,6 +26,11 @@ namespace KhoaBDRazorPage.Pages.Auth
 
         public async Task<IActionResult> OnPostAsync()
         {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
             if (Account.Email == AppConfig.Admin.Email && Account.Password == AppConfig.Admin.Email)
             {
                 var claims = new List<Claim>()

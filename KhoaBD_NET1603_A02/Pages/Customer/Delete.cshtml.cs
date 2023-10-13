@@ -11,9 +11,12 @@ using Application.Repository;
 using MapsterMapper;
 using Application.Common;
 using Domain.Dto;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace RazorPage.Pages.Customers
 {
+    [Authorize(Roles = "admin")]
     public class DeleteModel : PageModel
     {
         private readonly IUnitOfWork _unitOfWork;

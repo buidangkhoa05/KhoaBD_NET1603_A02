@@ -7,9 +7,12 @@ using PRN221.Domain.Models;
 using Application.Repository;
 using Domain.Dto;
 using MapsterMapper;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace RazorPage.Pages.Customers
 {
+    [Authorize(Roles = "admin")]
     public class CreateModel : PageModel
     {
         private readonly IUnitOfWork _unitOfWork;

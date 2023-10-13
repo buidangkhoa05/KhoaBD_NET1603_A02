@@ -11,9 +11,11 @@ using PRN221.Domain.Models;
 using Domain.Dto;
 using Application.Common;
 using Application.Repository;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RazorPage.Pages.Customers
 {
+    [Authorize(Roles = "admin")]
     public class IndexModel : PageModel
     {
         private readonly IUnitOfWork _unitOfWork;

@@ -1,25 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using MapsterMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Domain.Models;
-using PRN221.Domain.Models;
-using MapsterMapper;
-using Microsoft.AspNetCore.Authorization;
 using System.Data;
 
-namespace KhoaBDRazorPage.Pages.Rent
+namespace KhoaBDRazorPage.Pages
 {
-    [Authorize(Roles = "admin")]
-    public class CreateModel : PageModel
+    [Authorize(Roles = "customer")]
+    public class RentModel : PageModel
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public CreateModel(IUnitOfWork unitOfWork, IMapper mapper)
+        public RentModel(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -37,9 +31,9 @@ namespace KhoaBDRazorPage.Pages.Rent
 
         public async Task<IActionResult> OnGet(string? errorMessage = null)
         {
-            var selectListItems = await _unitOfWork.Customer.Get(new QueryHelper<Customer, CustomerDto>());
+            //var selectListItems = await _unitOfWork.Customer.Get(new QueryHelper<Customer, CustomerDto>());
 
-            ViewData["CustomerId"] = new SelectList(selectListItems, "CustomerId", "Email");
+            //ViewData["CustomerId"] = new SelectList(selectListItems, "CustomerId", "Email");
 
             var carList = await _unitOfWork.CarInformation.Get(new QueryHelper<CarInformation, CarInformationDto>());
 
@@ -63,13 +57,21 @@ namespace KhoaBDRazorPage.Pages.Rent
         // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
         public async Task<IActionResult> OnPostAsync()
         {
+            var cstomer = await _unitOfWork.Customer.GetFirstOrDefault(new QueryHelper<Customer>()
+            {
+                Filter = t => t.Email == User.Identity.Name
+            });
+
             var rentingTrans = _mapper.Map<RentingTransaction>(RentingTransaction);
+
+            rentingTrans.CustomerId = cstomer.CustomerId;
+            rentingTrans.RentingStatus = 1;
 
             var carPicked = PickCarDtos.Where(t => t.IsPicked)?.ToList();
 
             if (carPicked == null || !carPicked.Any())
             {
-                return RedirectToPage("/Rent/Create", new { errorMessage = "Must pick car" });
+                return RedirectToPage("/SelfRent", new { errorMessage = "Must pick car" });
             }
 
             foreach (var item in carPicked)
@@ -78,7 +80,7 @@ namespace KhoaBDRazorPage.Pages.Rent
 
                 if (!isValid)
                 {
-                    return RedirectToPage("/Rent/Create", new { errorMessage = "Date is not valid" });
+                    return RedirectToPage("/SelfRent", new { errorMessage = "Date is not valid" });
                 }
             }
 
@@ -134,6 +136,5 @@ namespace KhoaBDRazorPage.Pages.Rent
 
             return true;
         }
-
     }
 }

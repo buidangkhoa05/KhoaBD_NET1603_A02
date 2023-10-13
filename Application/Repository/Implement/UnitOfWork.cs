@@ -65,6 +65,15 @@ namespace Application.Repository
                 return new GenericRepository<RentingTransaction>(_dbContext);
             }
         }
+
+        public IGenericRepository<RentingDetail> RentingDetail
+        {
+            get
+            {
+                return new GenericRepository<RentingDetail>(_dbContext);
+            }
+        }
+       
         #endregion Repository
 
 

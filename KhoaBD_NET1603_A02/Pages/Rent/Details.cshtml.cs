@@ -7,9 +7,12 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Domain.Models;
 using PRN221.Domain.Models;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace KhoaBDRazorPage.Pages.Rent
 {
+    [Authorize(Roles = "admin")]
     public class DetailsModel : PageModel
     {
         private readonly IUnitOfWork _unitOfWork;

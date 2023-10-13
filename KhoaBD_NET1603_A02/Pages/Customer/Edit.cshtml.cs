@@ -12,9 +12,12 @@ using Application.Repository;
 using Domain.Dto;
 using Application.Common;
 using MapsterMapper;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace RazorPage.Pages.Customers
 {
+    [Authorize(Roles = "admin")]
     public class EditModel : PageModel
     {
         private readonly IUnitOfWork _unitOfWork;

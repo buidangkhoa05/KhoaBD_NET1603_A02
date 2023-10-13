@@ -1,13 +1,8 @@
 ﻿@page
-@model RazorPage.Pages.Customers.EditModel
-
+@model KhoaBDRazorPage.Pages.ProfileModel
 @{
-    ViewData["Title"] = "Edit";
 }
-
-<h1>Edit</h1>
-
-<h4>Customer</h4>
+<h4>Profile</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -24,10 +19,10 @@
                 <input asp-for="Customer.Telephone" class="form-control" />
                 <span asp-validation-for="Customer.Telephone" class="text-danger"></span>
             </div>
-            @*<div class="form-group">
-                <label asp-for="Customer.Email" class="control-label"></label>
-                <input asp-for="Customer.Email" class="form-control" />
-                <span asp-validation-for="Customer.Email" class="text-danger"></span>
+            @* <div class="form-group">
+            <label asp-for="Customer.Email" class="control-label"></label>
+            <input asp-for="Customer.Email" class="form-control" />
+            <span asp-validation-for="Customer.Email" class="text-danger"></span>
             </div>*@
             <div class="form-group">
                 <label asp-for="Customer.CustomerBirthday" class="control-label"></label>
@@ -56,5 +51,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

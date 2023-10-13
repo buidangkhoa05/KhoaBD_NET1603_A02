@@ -31,8 +31,8 @@ public partial class FucarRentingManagementContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        //optionsBuilder.UseSqlServer(AppConfig.ConnectionStrings.DefaultConnection);
-        optionsBuilder.UseSqlServer("Server=localhost;Database=FUCarRentingManagement;User Id=sa;Password=12345;TrustServerCertificate=true;");
+        optionsBuilder.UseSqlServer(AppConfig.ConnectionStrings.DefaultConnection);
+        //optionsBuilder.UseSqlServer("Server=localhost;Database=FUCarRentingManagement;User Id=sa;Password=12345;TrustServerCertificate=true;");
     }
 
 

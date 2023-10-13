@@ -8,9 +8,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Domain.Models;
 using PRN221.Domain.Models;
 using MapsterMapper;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace KhoaBDRazorPage.Pages.Car
 {
+    [Authorize(Roles = "admin")]
     public class CreateModel : PageModel
     {
         private readonly IUnitOfWork _unitOfWork;

@@ -10,9 +10,12 @@ using PRN221.Domain.Models;
 using MapsterMapper;
 using Team5.Domain.Common;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace KhoaBDRazorPage.Pages.Rent
 {
+    [Authorize(Roles = "admin")]
     public class IndexModel : PageModel
     {
         private readonly IUnitOfWork _unitOfWork;

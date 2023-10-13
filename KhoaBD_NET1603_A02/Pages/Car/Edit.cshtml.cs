@@ -9,9 +9,12 @@ using Microsoft.EntityFrameworkCore;
 using Domain.Models;
 using PRN221.Domain.Models;
 using MapsterMapper;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace KhoaBDRazorPage.Pages.Car
 {
+    [Authorize(Roles = "admin")]
     public class EditModel : PageModel
     {
         private readonly IUnitOfWork _unitOfWork;

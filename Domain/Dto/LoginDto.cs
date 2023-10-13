@@ -16,8 +16,6 @@ namespace Domain.Dto
     {
         public LoginDtoValidator()
         {
-
-
             RuleFor(u => u.Email)
                 .NotEmpty().WithMessage("Email is required.")
                 .Length(0, 50).WithMessage("Email cannot exceed 50 characters.")
