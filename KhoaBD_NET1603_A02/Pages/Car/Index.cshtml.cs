@@ -7,27 +7,101 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Domain.Models;
 using PRN221.Domain.Models;
+using Team5.Domain.Common;
 
 namespace KhoaBDRazorPage.Pages.Car
 {
     public class IndexModel : PageModel
     {
-        private readonly Domain.Models.FucarRentingManagementContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public IndexModel(Domain.Models.FucarRentingManagementContext context)
+        public IndexModel(IUnitOfWork unitOfWork)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
-        public IList<CarInformation> CarInformation { get;set; } = default!;
+        public string SearchText { get; set; } = null;
 
-        public async Task OnGetAsync()
+        public PagedList<CarInformationViewDto> CarInformationPaged { get; set; } = default!;
+
+        public async Task OnGetAsync(int? pageNumber, string searchText = "")
         {
-            if (_context.CarInformations != null)
+            var query = new QueryHelper<CarInformation, CarInformationViewDto>()
             {
-                CarInformation = await _context.CarInformations
-                .Include(c => c.Manufacturer)
-                .Include(c => c.Supplier).ToListAsync();
+                Selector = t => new CarInformationViewDto
+                {
+                    CarDescription = t.CarDescription,
+                    CarId = t.CarId,
+                    CarName = t.CarName,
+                    CarRentingPricePerDay = t.CarRentingPricePerDay,
+                    CarStatus = t.CarStatus,
+                    FuelType = t.FuelType,
+                    NumberOfDoors = t.NumberOfDoors,
+                    SeatingCapacity = t.SeatingCapacity,
+                    Year = t.Year,
+                    Manufacturer = t.Manufacturer.ManufacturerName,
+                    Supplier = t.Supplier.SupplierName,
+                },
+                Includes = new System.Linq.Expressions.Expression<Func<CarInformation, object>>[]
+                {
+                    t => t.Manufacturer,
+                    t => t.Supplier
+                },
+                PaginationParams = new PagingParameters(pageNumber, 5),
+                Filter = t => t.CarName.Contains(searchText)
+            };
+
+            try
+            {
+                var carInformations = await _unitOfWork.CarInformation.GetWithPagination(query);
+
+                CarInformationPaged = carInformations;
+
+                if (!string.IsNullOrEmpty(searchText))
+                {
+                    SearchText = searchText;
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        public async Task OnGetSearchAsync(int? pageNumber, string searchText)
+        {
+            var query = new QueryHelper<CarInformation, CarInformationViewDto>()
+            {
+                Selector = t => new CarInformationViewDto
+                {
+                    CarDescription = t.CarDescription,
+                    CarId = t.CarId,
+                    CarName = t.CarName,
+                    CarRentingPricePerDay = t.CarRentingPricePerDay,
+                    CarStatus = t.CarStatus,
+                    FuelType = t.FuelType,
+                    NumberOfDoors = t.NumberOfDoors,
+                    SeatingCapacity = t.SeatingCapacity,
+                    Year = t.Year,
+                    Manufacturer = t.Manufacturer.ManufacturerName,
+                    Supplier = t.Supplier.SupplierName,
+                },
+                Includes = new System.Linq.Expressions.Expression<Func<CarInformation, object>>[]
+                {
+                    t => t.Manufacturer,
+                    t => t.Supplier
+                },
+                PaginationParams = new PagingParameters(pageNumber, 5),
+                Filter = t => t.CarName.Contains(searchText)
+            };
+
+            try
+            {
+                var carInformations = await _unitOfWork.CarInformation.GetWithPagination(query);
+
+                CarInformationPaged = carInformations;
+            }
+            catch (Exception)
+            {
             }
         }
     }

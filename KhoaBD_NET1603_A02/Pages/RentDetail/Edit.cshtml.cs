@@ -9,39 +9,35 @@ using Microsoft.EntityFrameworkCore;
 using Domain.Models;
 using PRN221.Domain.Models;
 
-namespace KhoaBDRazorPage.Pages.Rent
+namespace KhoaBDRazorPage.Pages.RentDetail
 {
     public class EditModel : PageModel
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly Domain.Models.FucarRentingManagementContext _context;
 
-
-        public EditModel(IUnitOfWork unitOfWork)
+        public EditModel(Domain.Models.FucarRentingManagementContext context)
         {
-            _unitOfWork = unitOfWork;
+            _context = context;
         }
 
         [BindProperty]
-        public RentingTransaction RentingTransaction { get; set; } = default!;
+        public RentingDetail RentingDetail { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null)
+            if (id == null || _context.RentingDetails == null)
             {
                 return NotFound();
             }
 
-            var rentingtransaction = await _unitOfWork.RentingTrans.GetFirstOrDefault(new QueryHelper<RentingTransaction>() { Filter = t => t.RentingTransationId == id });
-            if (rentingtransaction == null)
+            var rentingdetail =  await _context.RentingDetails.FirstOrDefaultAsync(m => m.RentingTransactionId == id);
+            if (rentingdetail == null)
             {
                 return NotFound();
             }
-            RentingTransaction = rentingtransaction;
-
-            var customerDto = await _unitOfWork.Customer.Get(new QueryHelper<Customer, CustomerDto>());
-
-            ViewData["CustomerId"] = new SelectList(customerDto, "CustomerId", "Email");
-
+            RentingDetail = rentingdetail;
+           ViewData["CarId"] = new SelectList(_context.CarInformations, "CarId", "CarName");
+           ViewData["RentingTransactionId"] = new SelectList(_context.RentingTransactions, "RentingTransationId", "RentingTransationId");
             return Page();
         }
 
@@ -54,29 +50,30 @@ namespace KhoaBDRazorPage.Pages.Rent
                 return Page();
             }
 
+            _context.Attach(RentingDetail).State = EntityState.Modified;
+
             try
             {
-                await _unitOfWork.RentingTrans.UpdateAsync(RentingTransaction, true);
+                await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await RentingTransactionExists(RentingTransaction.RentingTransationId))
+                if (!RentingDetailExists(RentingDetail.RentingTransactionId))
                 {
                     return NotFound();
                 }
                 else
                 {
+                    throw;
                 }
             }
 
             return RedirectToPage("./Index");
         }
 
-        private async Task<bool> RentingTransactionExists(int id)
+        private bool RentingDetailExists(int id)
         {
-            var entity = await _unitOfWork.RentingTrans.GetFirstOrDefault(new QueryHelper<RentingTransaction>() { Filter = t => t.RentingTransationId == id });
-
-            return entity != null;
+          return (_context.RentingDetails?.Any(e => e.RentingTransactionId == id)).GetValueOrDefault();
         }
     }
 }

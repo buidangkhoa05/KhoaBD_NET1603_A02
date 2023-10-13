@@ -20,6 +20,10 @@ namespace Application.Repository
         #region Repository
 
         public IGenericRepository<Customer> Customer { get; }
+        public IGenericRepository<Manufacturer> Manufacturer { get; }
+        public IGenericRepository<Supplier> Supplier { get; }
+        public IGenericRepository<CarInformation> CarInformation { get; }
+        public IGenericRepository<RentingTransaction> RentingTrans { get; }
         #endregion Repository
     }
 }

@@ -11,7 +11,7 @@ namespace Application.Common
     public class QueryHelper<T> where T : class
     {
 
-        public PaginationParameters? PaginationParams { get; set; } = null;
+        public PagingParameters? PaginationParams { get; set; } = null;
 
         public Expression<Func<T, bool>>? Filter { get; set; } = null;
 

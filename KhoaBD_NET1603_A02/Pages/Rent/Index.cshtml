@@ -10,6 +10,10 @@
 <p>
     <a asp-page="Create">Create New</a>
 </p>
+<form method="get">
+    <input type="text" name="searchText" placeholder="Customer mail ..." value="@Model.SearchText">
+    <button type="submit">Search</button>
+</form>
 <table class="table">
     <thead>
         <tr>
@@ -29,26 +33,62 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.RentingTransaction) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.RentingDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TotalPrice)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RentingStatus)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Customer.Email)
-            </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.RentingTransationId">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.RentingTransationId">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.RentingTransationId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model.RentingTransaction)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.RentingDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TotalPrice)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.RentingStatus)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Customer.Email)
+                </td>
+                <td>
+                    <a asp-page="./Edit" asp-route-id="@item.RentingTransationId">Edit</a> |
+                    <a asp-page="./Details" asp-route-id="@item.RentingTransationId">Details</a> |
+                    <a asp-page="./Delete" asp-route-id="@item.RentingTransationId">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+@if (Model.RentingTransaction.TotalCount > 0)
+{
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+
+            @if (Model.RentingTransaction.HasPrevious)
+            {
+                <li class="m-2 page-item">
+                    @{
+                        var previous = Model.RentingTransaction.CurrentPage - 1;
+                    }
+                    <a asp-page="./Index" asp-route-pageNumber="@previous">Previous</a>
+                </li>
+            }
+
+            @for (var i = 1; i <= Model.RentingTransaction.TotalPages; i++)
+            {
+                <li class="m-2 page-item @(i == Model.RentingTransaction.CurrentPage ? "active" : "")">
+                    <a asp-page="./Index" asp-route-pageNumber="@i">@i</a>
+                </li>
+            }
+
+            @if (Model.RentingTransaction.HasNext)
+            {
+                <li class="m-2 page-item">
+                    @{
+                        var next = Model.RentingTransaction.CurrentPage + 1;
+                    }
+                    <a asp-page="./Index" asp-route-pageNumber="@next">Next</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

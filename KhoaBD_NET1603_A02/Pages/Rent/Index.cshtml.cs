@@ -7,26 +7,51 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Domain.Models;
 using PRN221.Domain.Models;
+using MapsterMapper;
+using Team5.Domain.Common;
+using Microsoft.IdentityModel.Tokens;
 
 namespace KhoaBDRazorPage.Pages.Rent
 {
     public class IndexModel : PageModel
     {
-        private readonly Domain.Models.FucarRentingManagementContext _context;
+        private readonly IUnitOfWork _unitOfWork;
+        private
+             readonly IMapper _mapper;
 
-        public IndexModel(Domain.Models.FucarRentingManagementContext context)
+        public IndexModel(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
-        public IList<RentingTransaction> RentingTransaction { get;set; } = default!;
+        public string SearchText { get; set; } = default!;
+        public PagedList<RentingTransactionDto> RentingTransaction { get; set; } = default!;
 
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(int? pageNumber, string? searchText = "")
         {
-            if (_context.RentingTransactions != null)
+            var queryHelper = new QueryHelper<RentingTransaction, RentingTransactionDto>()
             {
-                RentingTransaction = await _context.RentingTransactions
-                .Include(r => r.Customer).ToListAsync();
+                Selector = x => _mapper.Map<RentingTransactionDto>(x),
+                PaginationParams = new PagingParameters(pageNumber, null),
+                Includes = new System.Linq.Expressions.Expression<Func<RentingTransaction, object>>[]
+                {
+                    x => x.Customer
+                },
+                Filter = t => t.Customer.Email.Contains(searchText)
+            };
+
+            try
+            {
+                RentingTransaction = await _unitOfWork.RentingTrans.GetWithPagination(queryHelper);
+
+                if (!string.IsNullOrEmpty(searchText))
+                {
+                    SearchText = searchText;
+                }
+            }
+            catch (Exception)
+            {
             }
         }
     }

@@ -7,35 +7,44 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Domain.Models;
 using PRN221.Domain.Models;
+using Application.Repository;
+using MapsterMapper;
+using Application.Common;
+using Domain.Dto;
 
 namespace RazorPage.Pages.Customers
 {
     public class DeleteModel : PageModel
     {
-        private readonly Domain.Models.FucarRentingManagementContext _context;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public DeleteModel(Domain.Models.FucarRentingManagementContext context)
+        public DeleteModel(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         [BindProperty]
-      public Customer Customer { get; set; } = default!;
+        public CustomerDto Customer { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null || _context.Customers == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var customer = await _context.Customers.FirstOrDefaultAsync(m => m.CustomerId == id);
+            var queryHelper = new QueryHelper<Customer, CustomerDto>()
+            { Filter = t => t.CustomerId == id };
+
+            var customer = await _unitOfWork.Customer.GetFirstOrDefault(queryHelper);
 
             if (customer == null)
             {
                 return NotFound();
             }
-            else 
+            else
             {
                 Customer = customer;
             }
@@ -44,17 +53,19 @@ namespace RazorPage.Pages.Customers
 
         public async Task<IActionResult> OnPostAsync(int? id)
         {
-            if (id == null || _context.Customers == null)
+            if (id == null)
             {
                 return NotFound();
             }
-            var customer = await _context.Customers.FindAsync(id);
+            var queryHelper = new QueryHelper<Customer, CustomerDto>()
+            { Filter = t => t.CustomerId == id };
+
+            var customer = await _unitOfWork.Customer.GetFirstOrDefault(queryHelper);
 
             if (customer != null)
             {
                 Customer = customer;
-                _context.Customers.Remove(Customer);
-                await _context.SaveChangesAsync();
+                await _unitOfWork.Customer.DeleteAsync(t => t.CustomerId == Customer.CustomerId);
             }
 
             return RedirectToPage("./Index");

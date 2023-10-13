@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PRN221.Domain.Models;
 
@@ -26,19 +27,18 @@ public class RentingTransactionValidator : AbstractValidator<RentingTransaction>
     public RentingTransactionValidator()
     {
         RuleFor(x => x.RentingTransationId)
-    .GreaterThanOrEqualTo(-1).WithMessage("Mã giao dịch thuê phải lớn hơn hoặc bằng -1.");
+            .GreaterThanOrEqualTo(-1).WithMessage("Rent transaction ID must be greater than or equal to -1.");
 
         RuleFor(x => x.RentingDate)
-            .NotEmpty().WithMessage("Ngày thuê không được để trống.");
+            .NotEmpty().WithMessage("Renting date cannot be empty.");
 
         RuleFor(x => x.TotalPrice)
-            .NotEmpty().WithMessage("Tổng giá thuê không được để trống.");
+            .NotEmpty().WithMessage("Total rent price cannot be empty.");
 
         RuleFor(x => x.CustomerId)
-            .GreaterThanOrEqualTo(-1).WithMessage("Mã khách hàng phải lớn hơn hoặc bằng -1.");
+            .GreaterThanOrEqualTo(-1).WithMessage("Customer ID must be greater than or equal to -1.");
 
         RuleFor(x => x.RentingStatus)
-            .NotEmpty().WithMessage("Trạng thái thuê không được để trống.");
-
+            .NotEmpty().WithMessage("Renting status cannot be empty.");
     }
 }

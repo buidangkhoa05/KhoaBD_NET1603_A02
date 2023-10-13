@@ -1,0 +1,46 @@
+﻿@page
+@model KhoaBDRazorPage.Pages.RentDetail.EditModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>RentingDetail</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="RentingDetail.RentingTransactionId" />
+            <input type="hidden" asp-for="RentingDetail.CarId" />
+            <div class="form-group">
+                <label asp-for="RentingDetail.StartDate" class="control-label"></label>
+                <input asp-for="RentingDetail.StartDate" class="form-control" />
+                <span asp-validation-for="RentingDetail.StartDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RentingDetail.EndDate" class="control-label"></label>
+                <input asp-for="RentingDetail.EndDate" class="form-control" />
+                <span asp-validation-for="RentingDetail.EndDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RentingDetail.Price" class="control-label"></label>
+                <input asp-for="RentingDetail.Price" class="form-control" />
+                <span asp-validation-for="RentingDetail.Price" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

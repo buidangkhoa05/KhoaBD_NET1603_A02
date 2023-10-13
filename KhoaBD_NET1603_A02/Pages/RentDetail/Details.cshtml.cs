@@ -8,34 +8,34 @@ using Microsoft.EntityFrameworkCore;
 using Domain.Models;
 using PRN221.Domain.Models;
 
-namespace KhoaBDRazorPage.Pages.Rent
+namespace KhoaBDRazorPage.Pages.RentDetail
 {
     public class DetailsModel : PageModel
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly Domain.Models.FucarRentingManagementContext _context;
 
-        public DetailsModel(IUnitOfWork unitOfWork)
+        public DetailsModel(Domain.Models.FucarRentingManagementContext context)
         {
-            _unitOfWork = unitOfWork;
+            _context = context;
         }
 
-      public RentingTransaction RentingTransaction { get; set; } = default!; 
+      public RentingDetail RentingDetail { get; set; } = default!; 
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null)
+            if (id == null || _context.RentingDetails == null)
             {
                 return NotFound();
             }
 
-            var rentingtransaction = await _unitOfWork.RentingTrans.GetFirstOrDefault(new QueryHelper<RentingTransaction>() { Filter = t => t.RentingTransationId == id});
-            if (rentingtransaction == null)
+            var rentingdetail = await _context.RentingDetails.FirstOrDefaultAsync(m => m.RentingTransactionId == id);
+            if (rentingdetail == null)
             {
                 return NotFound();
             }
             else 
             {
-                RentingTransaction = rentingtransaction;
+                RentingDetail = rentingdetail;
             }
             return Page();
         }

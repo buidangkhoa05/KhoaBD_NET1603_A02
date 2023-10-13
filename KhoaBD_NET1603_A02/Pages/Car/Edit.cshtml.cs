@@ -8,36 +8,49 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Domain.Models;
 using PRN221.Domain.Models;
+using MapsterMapper;
 
 namespace KhoaBDRazorPage.Pages.Car
 {
     public class EditModel : PageModel
     {
-        private readonly Domain.Models.FucarRentingManagementContext _context;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public EditModel(Domain.Models.FucarRentingManagementContext context)
+        public EditModel(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         [BindProperty]
-        public CarInformation CarInformation { get; set; } = default!;
+        public CarInformationDto CarInformation { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null || _context.CarInformations == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var carinformation =  await _context.CarInformations.FirstOrDefaultAsync(m => m.CarId == id);
-            if (carinformation == null)
+            var car = await _unitOfWork.CarInformation.GetFirstOrDefault(new QueryHelper<CarInformation, CarInformationDto>()
+            {
+                Filter = t => t.CarId == id,
+            });
+
+            if (car == null)
             {
                 return NotFound();
             }
-            CarInformation = carinformation;
-           ViewData["ManufacturerId"] = new SelectList(_context.Manufacturers, "ManufacturerId", "ManufacturerName");
-           ViewData["SupplierId"] = new SelectList(_context.Suppliers, "SupplierId", "SupplierName");
+
+            CarInformation = car;
+
+            var manufacturers = await _unitOfWork.Manufacturer.Get(new QueryHelper<Manufacturer, ManufacturerDto>());
+            var suppliers = await _unitOfWork.Supplier.Get(new QueryHelper<Supplier, SupplierDto>());
+
+            ViewData["ManufacturerId"] = new SelectList(manufacturers, "ManufacturerId", "ManufacturerName");
+            ViewData["SupplierId"] = new SelectList(suppliers, "SupplierId", "SupplierName");
+
             return Page();
         }
 
@@ -50,15 +63,13 @@ namespace KhoaBDRazorPage.Pages.Car
                 return Page();
             }
 
-            _context.Attach(CarInformation).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                var createReult = await _unitOfWork.CarInformation.UpdateAsync(_mapper.Map<CarInformation>(CarInformation), true);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CarInformationExists(CarInformation.CarId))
+                if (!await CarInformationExists(CarInformation.CarId))
                 {
                     return NotFound();
                 }
@@ -71,9 +82,9 @@ namespace KhoaBDRazorPage.Pages.Car
             return RedirectToPage("./Index");
         }
 
-        private bool CarInformationExists(int id)
+        private async Task<bool> CarInformationExists(int id)
         {
-          return (_context.CarInformations?.Any(e => e.CarId == id)).GetValueOrDefault();
+            return (await _unitOfWork.CarInformation.GetFirstOrDefault(new QueryHelper<CarInformation>() { Filter = t => t.CarId == id })) != null;
         }
     }
 }

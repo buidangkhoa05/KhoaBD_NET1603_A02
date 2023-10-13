@@ -10,81 +10,123 @@
 <p>
     <a asp-page="Create">Create New</a>
 </p>
+
+<form method="get">
+    <input type="text" name="searchText" placeholder="Name car ..." value="@Model.SearchText">
+    <button type="submit">Search</button>
+</form>
+
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.CarInformation[0].CarName)
+                @Html.DisplayNameFor(model => model.CarInformationPaged[0].CarName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CarInformation[0].CarDescription)
+                @Html.DisplayNameFor(model => model.CarInformationPaged[0].CarDescription)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CarInformation[0].NumberOfDoors)
+                @Html.DisplayNameFor(model => model.CarInformationPaged[0].NumberOfDoors)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CarInformation[0].SeatingCapacity)
+                @Html.DisplayNameFor(model => model.CarInformationPaged[0].SeatingCapacity)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CarInformation[0].FuelType)
+                @Html.DisplayNameFor(model => model.CarInformationPaged[0].FuelType)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CarInformation[0].Year)
+                @Html.DisplayNameFor(model => model.CarInformationPaged[0].Year)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CarInformation[0].CarStatus)
+                @Html.DisplayNameFor(model => model.CarInformationPaged[0].CarStatus)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CarInformation[0].CarRentingPricePerDay)
+                @Html.DisplayNameFor(model => model.CarInformationPaged[0].CarRentingPricePerDay)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CarInformation[0].Manufacturer)
+                @Html.DisplayNameFor(model => model.CarInformationPaged[0].Manufacturer)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CarInformation[0].Supplier)
+                @Html.DisplayNameFor(model => model.CarInformationPaged[0].Supplier)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.CarInformation) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.CarName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CarDescription)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NumberOfDoors)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SeatingCapacity)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FuelType)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Year)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CarStatus)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CarRentingPricePerDay)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Manufacturer.ManufacturerName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Supplier.SupplierName)
-            </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.CarId">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.CarId">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.CarId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model.CarInformationPaged)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CarName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CarDescription)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NumberOfDoors)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SeatingCapacity)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FuelType)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Year)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CarStatus)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CarRentingPricePerDay)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Manufacturer)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Supplier)
+                </td>
+                <td>
+                    <a asp-page="./Edit" asp-route-id="@item.CarId">Edit</a> |
+                    @*    <a asp-page="./Details" asp-route-id="@item.CarId">Details</a> |*@
+                    <a asp-page="./Delete" asp-route-id="@item.CarId">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+@if (Model.CarInformationPaged.TotalCount > 0)
+{
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+
+            @if (Model.CarInformationPaged.HasPrevious)
+            {
+                <li class="m-2 page-item">
+                    @{
+                        var previous = Model.CarInformationPaged.CurrentPage - 1;
+                    }
+                    <a asp-page="./Index" asp-route-pageNumber="@previous">Previous</a>
+                </li>
+            }
+
+            @for (var i = 1; i <= Model.CarInformationPaged.TotalPages; i++)
+            {
+                <li class="m-2 page-item @(i == Model.CarInformationPaged.CurrentPage ? "active" : "")">
+                    <a asp-page="./Index" asp-route-pageNumber="@i">@i</a>
+                </li>
+            }
+
+            @if (Model.CarInformationPaged.HasNext)
+            {
+                <li class="m-2 page-item">
+                    @{
+                        var next = Model.CarInformationPaged.CurrentPage + 1;
+                    }
+                    <a asp-page="./Index" asp-route-pageNumber="@next">Next</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

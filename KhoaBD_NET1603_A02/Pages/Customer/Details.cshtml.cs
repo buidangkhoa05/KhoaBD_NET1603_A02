@@ -6,34 +6,34 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Domain.Models;
-using PRN221.Domain.Models;
+
 
 namespace RazorPage.Pages.Customers
 {
     public class DetailsModel : PageModel
     {
-        private readonly Domain.Models.FucarRentingManagementContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public DetailsModel(Domain.Models.FucarRentingManagementContext context)
+        public DetailsModel(IUnitOfWork unitOfWork)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
-      public Customer Customer { get; set; } = default!; 
+        public CustomerDto Customer { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null || _context.Customers == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var customer = await _context.Customers.FirstOrDefaultAsync(m => m.CustomerId == id);
+            var customer = await _unitOfWork.Customer.GetFirstOrDefault(new QueryHelper<Customer, CustomerDto>() { Filter = t => t.CustomerId == id });
             if (customer == null)
             {
                 return NotFound();
             }
-            else 
+            else
             {
                 Customer = customer;
             }

@@ -7,40 +7,130 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Domain.Models;
 using PRN221.Domain.Models;
+using MapsterMapper;
 
 namespace KhoaBDRazorPage.Pages.Rent
 {
     public class CreateModel : PageModel
     {
-        private readonly Domain.Models.FucarRentingManagementContext _context;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public CreateModel(Domain.Models.FucarRentingManagementContext context)
+        public CreateModel(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _context = context;
-        }
-
-        public IActionResult OnGet()
-        {
-        ViewData["CustomerId"] = new SelectList(_context.Customers, "CustomerId", "Email");
-            return Page();
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         [BindProperty]
-        public RentingTransaction RentingTransaction { get; set; } = default!;
-        
+        public string ErrorMessage { get; set; }
+
+        [BindProperty]
+        public RentingTransactionDto RentingTransaction { get; set; } = default!;
+
+        [BindProperty]
+        public List<PickCarDto> PickCarDtos { get; set; }
+
+
+        public async Task<IActionResult> OnGet(string? errorMessage = null)
+        {
+            var selectListItems = await _unitOfWork.Customer.Get(new QueryHelper<Customer, CustomerDto>());
+
+            ViewData["CustomerId"] = new SelectList(selectListItems, "CustomerId", "Email");
+
+            var carList = await _unitOfWork.CarInformation.Get(new QueryHelper<CarInformation, CarInformationDto>());
+
+            var pickCarList = carList.Select(t => new PickCarDto()
+            {
+                CardId = t.CarId,
+                CarName = t.CarName,
+                CarRentingPricePerDay = t.CarRentingPricePerDay,
+                FuelType = t.FuelType,
+                NumberOfDoors = t.NumberOfDoors,
+                SeatingCapacity = t.SeatingCapacity,
+            });
+
+            PickCarDtos = pickCarList.ToList();
+
+            ErrorMessage = errorMessage;
+
+            return Page();
+        }
 
         // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
         public async Task<IActionResult> OnPostAsync()
         {
-          if (!ModelState.IsValid || _context.RentingTransactions == null || RentingTransaction == null)
+            var rentingTrans = _mapper.Map<RentingTransaction>(RentingTransaction);
+
+            var carPicked = PickCarDtos.Where(t => t.IsPicked)?.ToList();
+
+            if (carPicked == null || !carPicked.Any())
             {
-                return Page();
+                return RedirectToPage("/Rent/Create", new { errorMessage = "Must pick car" });
             }
 
-            _context.RentingTransactions.Add(RentingTransaction);
-            await _context.SaveChangesAsync();
+            foreach (var item in carPicked)
+            {
+                var isValid = await ValidateDateForRent(item.StartDate, item.EndDate, item.CardId);
+
+                if (!isValid)
+                {
+                    return RedirectToPage("/Rent/Create", new { errorMessage = "Date is not valid" });
+                }
+            }
+
+            var rentingDetails = carPicked.Select(t => new RentingDetail()
+            {
+                CarId = t.CardId,
+                StartDate = t.StartDate,
+                EndDate = t.EndDate,
+                Price = t.CarRentingPricePerDay,
+            }).ToList();
+
+            var maxId = (await _unitOfWork.RentingTrans.Get(new QueryHelper<RentingTransaction>())).MaxBy(t => t.RentingTransationId);
+
+
+            rentingTrans.RentingDetails = rentingDetails;
+            rentingTrans.TotalPrice = rentingDetails.Sum(t => t.Price);
+            rentingTrans.RentingDate = DateTime.Now;
+            rentingTrans.RentingStatus = 1;
+            rentingTrans.RentingTransationId = maxId.RentingTransationId + 1;
+
+            try
+            {
+                var result = await _unitOfWork.RentingTrans.CreateAsync(rentingTrans, true);
+            }
+            catch (Exception)
+            {
+
+            }
 
             return RedirectToPage("./Index");
         }
+
+        public async Task<bool> ValidateDateForRent(DateTime nStart, DateTime nEnd, int carId)
+        {
+            if (nStart > nEnd)
+            {
+                return false;
+            }
+
+            var cars = await _unitOfWork.CarInformation.Get(new QueryHelper<CarInformation>()
+            {
+                Includes = new System.Linq.Expressions.Expression<Func<CarInformation, object>>[]
+                {
+                    t => t.RentingDetails
+                },
+                Filter = t => t.RentingDetails.Any(t => t.CarId == carId && !(nEnd < t.StartDate || nStart > t.EndDate))
+            });
+
+            if (cars.Any())
+            {
+                return false;
+            }
+
+            return true;
+        }
+
     }
 }

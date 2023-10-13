@@ -33,6 +33,38 @@ namespace Application.Repository
                 return new GenericRepository<Customer>(_dbContext);
             }
         }
+
+        public IGenericRepository<CarInformation> CarInformation
+        {
+            get
+            {
+                return new GenericRepository<CarInformation>(_dbContext);
+            }
+        }
+
+        public IGenericRepository<Manufacturer> Manufacturer
+        {
+            get
+            {
+                return new GenericRepository<Manufacturer>(_dbContext);
+            }
+        }
+
+        public IGenericRepository<Supplier> Supplier
+        {
+            get
+            {
+                return new GenericRepository<Supplier>(_dbContext);
+            }
+        }
+
+        public IGenericRepository<RentingTransaction> RentingTrans
+        {
+            get
+            {
+                return new GenericRepository<RentingTransaction>(_dbContext);
+            }
+        }
         #endregion Repository
 
 

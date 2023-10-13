@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33927.249
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KhoaBDRazorPage", "KhoaBD_NET1603_A02\KhoaBDRazorPage.csproj", "{8946533A-24C0-4167-A444-58D2C98404A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KhoaBDRazorPage", "KhoaBD_NET1603_A02\KhoaBDRazorPage.csproj", "{8946533A-24C0-4167-A444-58D2C98404A5}"
 	ProjectSection(ProjectDependencies) = postProject
 		{D5A4DF9F-210E-44A4-B0AA-68B98A79519F} = {D5A4DF9F-210E-44A4-B0AA-68B98A79519F}
 	EndProjectSection

@@ -12,30 +12,30 @@ namespace KhoaBDRazorPage.Pages.Rent
 {
     public class DeleteModel : PageModel
     {
-        private readonly Domain.Models.FucarRentingManagementContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public DeleteModel(Domain.Models.FucarRentingManagementContext context)
+        public DeleteModel(IUnitOfWork unitOfWork)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
         [BindProperty]
-      public RentingTransaction RentingTransaction { get; set; } = default!;
+        public RentingTransaction RentingTransaction { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null || _context.RentingTransactions == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var rentingtransaction = await _context.RentingTransactions.FirstOrDefaultAsync(m => m.RentingTransationId == id);
+            var rentingtransaction = await _unitOfWork.RentingTrans.GetFirstOrDefault(new QueryHelper<RentingTransaction>() { Filter = t => t.RentingTransationId == id });
 
             if (rentingtransaction == null)
             {
                 return NotFound();
             }
-            else 
+            else
             {
                 RentingTransaction = rentingtransaction;
             }
@@ -44,18 +44,12 @@ namespace KhoaBDRazorPage.Pages.Rent
 
         public async Task<IActionResult> OnPostAsync(int? id)
         {
-            if (id == null || _context.RentingTransactions == null)
+            if (id == null)
             {
                 return NotFound();
             }
-            var rentingtransaction = await _context.RentingTransactions.FindAsync(id);
 
-            if (rentingtransaction != null)
-            {
-                RentingTransaction = rentingtransaction;
-                _context.RentingTransactions.Remove(RentingTransaction);
-                await _context.SaveChangesAsync();
-            }
+            await _unitOfWork.RentingTrans.DeleteAsync(t => t.RentingTransationId == id);
 
             return RedirectToPage("./Index");
         }

@@ -7,39 +7,58 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Domain.Models;
 using PRN221.Domain.Models;
+using MapsterMapper;
 
 namespace KhoaBDRazorPage.Pages.Car
 {
     public class CreateModel : PageModel
     {
-        private readonly Domain.Models.FucarRentingManagementContext _context;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public CreateModel(Domain.Models.FucarRentingManagementContext context)
+        public CreateModel(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnGet()
         {
-        ViewData["ManufacturerId"] = new SelectList(_context.Manufacturers, "ManufacturerId", "ManufacturerName");
-        ViewData["SupplierId"] = new SelectList(_context.Suppliers, "SupplierId", "SupplierName");
-            return Page();
+
+            try
+            {
+                var manufacturers = await _unitOfWork.Manufacturer.Get(new QueryHelper<Manufacturer, ManufacturerDto>());
+                var suppliers = await _unitOfWork.Supplier.Get(new QueryHelper<Supplier, SupplierDto>());
+
+                ViewData["ManufacturerId"] = new SelectList(manufacturers, "ManufacturerId", "ManufacturerName");
+                ViewData["SupplierId"] = new SelectList(suppliers, "SupplierId", "SupplierName");
+                return Page();
+            }
+            catch (Exception)
+            {
+                return NotFound();
+            }
         }
 
         [BindProperty]
-        public CarInformation CarInformation { get; set; } = default!;
-        
+        public CarInformationDto CarInformation { get; set; } = default!;
+
 
         // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
         public async Task<IActionResult> OnPostAsync()
         {
-          if (!ModelState.IsValid || _context.CarInformations == null || CarInformation == null)
+            if (!ModelState.IsValid || CarInformation == null)
             {
                 return Page();
             }
 
-            _context.CarInformations.Add(CarInformation);
-            await _context.SaveChangesAsync();
+            try
+            {
+                var resultCreate = await _unitOfWork.CarInformation.CreateAsync(_mapper.Map<CarInformation>(CarInformation), true);
+            }
+            catch (Exception)
+            {
+            }
 
             return RedirectToPage("./Index");
         }
