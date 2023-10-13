@@ -20,6 +20,8 @@ namespace Application.Configuration
             while (AppConfig.ConnectionStrings == null);
 
             configuration.Bind("ConnectionStrings", AppConfig.ConnectionStrings);
+            configuration.Bind("Admin", AppConfig.Admin);
+
         }
     }
 }

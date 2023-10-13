@@ -8,6 +8,7 @@ namespace Domain.Dto
 {
     public class CreateAccountrDto
     {
+
         public string? CustomerName { get; set; }
 
         public string? Telephone { get; set; }

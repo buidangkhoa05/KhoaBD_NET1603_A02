@@ -31,7 +31,7 @@ namespace KhoaBDRazorPage.Pages.Auth
                 return Page();
             }
 
-            if (Account.Email == AppConfig.Admin.Email && Account.Password == AppConfig.Admin.Email)
+            if (Account.Email == AppConfig.Admin.Email && Account.Password == AppConfig.Admin.Password)
             {
                 var claims = new List<Claim>()
                 {
